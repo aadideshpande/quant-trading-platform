@@ -1,5 +1,13 @@
 version: "3.9"
 services:
+  portfolio-service:
+    build: ./services/portfolio-service
+    env_file:
+      - ./services/portfolio-service/.env
+    ports:
+      - "8002:8002"
+    depends_on:
+      - rabbitmq
   price-service:
     build: ./services/price-service
     env_file:
