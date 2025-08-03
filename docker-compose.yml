@@ -1,5 +1,11 @@
 version: "3.9"
 services:
+  price-service:
+    build: ./services/price-service
+    env_file:
+      - ./services/price-service/.env
+    ports:
+      - "8001:8001"
   order-service:
     build: ./services/order-service
     env_file:
