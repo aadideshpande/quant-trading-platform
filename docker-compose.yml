@@ -24,6 +24,7 @@ services:
       - "8000:8000"
     depends_on:
       - order-db
+      - rabbitmq
   rabbitmq:
     image: rabbitmq:3-management
     ports:
