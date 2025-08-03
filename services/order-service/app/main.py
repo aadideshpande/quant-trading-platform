@@ -20,6 +20,17 @@ ORDER_QUEUE = os.getenv("RABBITMQ_ORDER_QUEUE", "trade.orders")
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Your React app origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 class Order(BaseModel):
     symbol: str
     quantity: int
