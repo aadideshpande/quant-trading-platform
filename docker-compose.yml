@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+  dashboard-ui:
+    build:
+      context: ./services/dashboard-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./services/dashboard-ui:/app
+      - /app/node_modules
+    command: npm start
+    depends_on:
+      - order-service
+      - portfolio-service
+
+  portfolio-service:
+    build: ./services/portfolio-service
+    env_file:
+      - ./services/portfolio-service/.env
+    ports:
+      - "8002:8002"
+    depends_on:
+      - rabbitmq
+  price-service:
+    build: ./services/price-service
+    env_file:
+      - ./services/price-service/.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      - rabbitmq
+  order-service:
+    build: ./services/order-service
+    env_file:
+      - ./services/order-service/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - order-db
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  order-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: order_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: order_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+
+volumes:
+  order-db-data:
