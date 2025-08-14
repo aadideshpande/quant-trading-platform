@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchPortfolio, fetchTrades } from './api';
 import PortfolioTable from './components/PortfolioTable';
 import TradeTable from './components/TradeTable';
+import TradeTicket from './components/TradeTicket';
 
 function App() {
   const [portfolio, setPortfolio] = useState([]);
@@ -30,6 +31,7 @@ function App() {
   return (
     <div className="container mt-4">
       <h1 className="mb-4">📊 Real-Time Portfolio Dashboard</h1>
+      <TradeTicket />
       <h3>Total Value: ${total.toFixed(2)}</h3>
       <hr />
       <h4>Holdings</h4>
