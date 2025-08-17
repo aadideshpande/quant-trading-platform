@@ -103,7 +103,11 @@ async def submit_order(order: Order):
         await session.commit()
 
     # Publish to RabbitMQ
-    message = json.dumps(order.dict()).encode()
+    message = json.dumps({
+        "symbol": order.symbol.upper(),
+        "quantity": order.quantity,
+        "side": order.side.upper()
+    }).encode()
     await rabbitmq_channel.default_exchange.publish(
         aio_pika.Message(body=message),
         routing_key=ORDER_QUEUE
