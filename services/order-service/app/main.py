@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from pydantic import BaseModel
 import aio_pika
 import os
@@ -11,6 +11,7 @@ from sqlalchemy.future import select
 import asyncio
 from typing import List
 from datetime import datetime
+import re
 
 
 load_dotenv()
@@ -19,6 +20,7 @@ RABBITMQ_URL = os.getenv("RABBITMQ_URL")
 ORDER_QUEUE = os.getenv("RABBITMQ_ORDER_QUEUE", "trade.orders")
 
 app = FastAPI()
+router = APIRouter()
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -76,14 +78,27 @@ async def startup_event():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-@app.post("/order")
+@router.post("/order")
 async def submit_order(order: Order):
+    # Validate order side
     if order.side.upper() not in {"BUY", "SELL"}:
-        raise HTTPException(status_code=400, detail="Invalid order side")
+        raise HTTPException(status_code=400, detail="Invalid order side. Must be 'BUY' or 'SELL'.")
+
+    # Validate quantity
+    if order.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Quantity must be a positive integer.")
+
+    # Validate symbol
+    if not re.fullmatch(r"[A-Z]{1,5}", order.symbol.upper()):
+        raise HTTPException(status_code=400, detail="Invalid symbol. Must be 1–5 uppercase letters.")
 
     # Save to DB
     async with SessionLocal() as session:
-        db_order = Trade(symbol=order.symbol.upper(), quantity=order.quantity, side=order.side.upper())
+        db_order = Trade(
+            symbol=order.symbol.upper(),
+            quantity=order.quantity,
+            side=order.side.upper()
+        )
         session.add(db_order)
         await session.commit()
 
@@ -93,5 +108,7 @@ async def submit_order(order: Order):
         aio_pika.Message(body=message),
         routing_key=ORDER_QUEUE
     )
+
     return {"status": "submitted", "order": order}
 
+app.include_router(router)
