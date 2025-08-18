@@ -43,20 +43,22 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests (placeholder)'
-                // Add test commands here, like pytest, npm test, etc.
             }
         }
 
         stage('Security Scan') {
             steps {
                 echo 'Running static analysis scan (placeholder)'
-                // Add scan tools like Trivy, SonarQube CLI, etc.
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: "${DOCKERHUB_CREDENTIALS}",
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS')]) {
+                    
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
@@ -72,7 +74,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deployment logic goes here (manual or automated)'
-                // We'll handle this part after your image push is confirmed working
             }
         }
     }
