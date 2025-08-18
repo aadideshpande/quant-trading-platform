@@ -12,28 +12,28 @@ pipeline {
                 stage('Build Order Service') {
                     steps {
                         dir('services/order-service') {
-                            sh 'docker build -t aadideshpande1/order-service:${IMAGE_TAG} .'
+                            sh 'docker build -t aadideshpande1/quant-trading-platform-order-service:${IMAGE_TAG} .'
                         }
                     }
                 }
                 stage('Build Price Service') {
                     steps {
                         dir('services/price-service') {
-                            sh 'docker build -t aadideshpande1/price-service:${IMAGE_TAG} .'
+                            sh 'docker build -t aadideshpande1/quant-trading-platform-price-service:${IMAGE_TAG} .'
                         }
                     }
                 }
                 stage('Build Portfolio Service') {
                     steps {
                         dir('services/portfolio-service') {
-                            sh 'docker build -t aadideshpande1/portfolio-service:${IMAGE_TAG} .'
+                            sh 'docker build -t aadideshpande1/quant-trading-platform-portfolio-service:${IMAGE_TAG} .'
                         }
                     }
                 }
                 stage('Build Dashboard UI') {
                     steps {
                         dir('services/dashboard-ui') {
-                            sh 'docker build -t aadideshpande1/dashboard-ui:${IMAGE_TAG} .'
+                            sh 'docker build -t aadideshpande1/quant-trading-platform-dashboard-ui:${IMAGE_TAG} .'
                         }
                     }
                 }
