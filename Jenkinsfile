@@ -60,10 +60,10 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
-                        docker push aadideshpande1/order-service:${IMAGE_TAG}
-                        docker push aadideshpande1/price-service:${IMAGE_TAG}
-                        docker push aadideshpande1/portfolio-service:${IMAGE_TAG}
-                        docker push aadideshpande1/dashboard-ui:${IMAGE_TAG}
+                        docker push aadideshpande1/quant-trading-platform-order-service:${IMAGE_TAG}
+                        docker push aadideshpande1/quant-trading-platform-price-service:${IMAGE_TAG}
+                        docker push aadideshpande1/quant-trading-platform-portfolio-service:${IMAGE_TAG}
+                        docker push aadideshpande1/quant-trading-platform-dashboard-ui:${IMAGE_TAG}
                     '''
                 }
             }
