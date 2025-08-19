@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "aadideshpande1/quant-trading-platform-price-service"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "Running build checks for Price Service..."'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'echo "Running tests for Price Service..."'
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh 'echo "Running static security analysis..."'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} ./services/price-service'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_IMAGE:${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying Price Service build ${BUILD_NUMBER}..."
+            }
+        }
+    }
+}

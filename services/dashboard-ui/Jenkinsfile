@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "aadideshpande1/quant-trading-platform-dashboard-ui"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "Running frontend build for Dashboard UI..."'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'echo "Running frontend tests..."'
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh 'echo "Running static code analysis for UI..."'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} ./services/dashboard-ui'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_IMAGE:${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying Dashboard UI build ${BUILD_NUMBER}..."
+            }
+        }
+    }
+}

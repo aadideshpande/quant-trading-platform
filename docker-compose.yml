@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   dashboard-ui:
     build:
@@ -23,6 +24,7 @@ services:
       - "8002:8002"
     depends_on:
       - rabbitmq
+
   price-service:
     build: ./services/price-service
     env_file:
@@ -31,6 +33,7 @@ services:
       - "8001:8001"
     depends_on:
       - rabbitmq
+
   order-service:
     build: ./services/order-service
     env_file:
@@ -40,11 +43,13 @@ services:
     depends_on:
       - order-db
       - rabbitmq
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - "5672:5672"
       - "15672:15672"
+
   order-db:
     image: postgres:15
     environment:
@@ -56,5 +61,18 @@ services:
     volumes:
       - order-db-data:/var/lib/postgresql/data
 
+  jenkins:
+    build:
+      context: ./jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    restart: unless-stopped
+
 volumes:
   order-db-data:
+  jenkins_home:
