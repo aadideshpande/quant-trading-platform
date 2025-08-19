@@ -79,28 +79,29 @@ pipeline {
 
         stage('Deploy') {
             when {
-                expression {
-                    return env.BRANCH_NAME == 'develop' || 
-                        env.BRANCH_NAME.startsWith('release/') || 
-                        (env.BRANCH_NAME == 'main' && currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause) != null)
+                anyOf {
+                    branch 'develop'
+                    branch 'main'
+                    expression { return env.BRANCH_NAME?.startsWith("release/") }
                 }
             }
             steps {
                 script {
                     if (env.BRANCH_NAME == 'develop') {
-                        echo '✅ Auto-deploying to DEV environment...'
-                        // Insert deploy-to-dev.sh or docker-compose -f docker-compose.dev.yml up -d
+                        echo 'Deploying to DEV...'
+                        // deploy to dev logic
                     } else if (env.BRANCH_NAME.startsWith('release/')) {
-                        echo '✅ Auto-deploying to STAGING environment...'
-                        // Insert deploy-to-staging.sh or docker-compose -f docker-compose.staging.yml up -d
+                        echo 'Deploying to STAGING...'
+                        // deploy to staging logic
                     } else if (env.BRANCH_NAME == 'main') {
-                        input message: '⚠️ Manual approval required to deploy to PROD. Proceed?', ok: 'Deploy'
-                        echo '🚀 Deploying to PRODUCTION environment...'
-                        // Insert deploy-to-prod.sh or docker-compose -f docker-compose.prod.yml up -d
+                        input message: 'Manual approval required for production deployment'
+                        echo 'Deploying to PROD...'
+                        // deploy to prod logic
                     }
                 }
             }
         }
+
 
     }
 }
