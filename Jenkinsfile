@@ -75,10 +75,28 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'develop' || 
+                        env.BRANCH_NAME.startsWith('release/') || 
+                        (env.BRANCH_NAME == 'main' && currentBuild.rawBuild.getCause(hudson.model.Cause$UserIdCause) != null)
+                }
+            }
             steps {
-                echo '🚀 Deployment logic goes here (manual or automated)'
-                // Add kubectl/helm/kustomize deploy logic here
+                script {
+                    if (env.BRANCH_NAME == 'develop') {
+                        echo 'Deploying to DEV environment...'
+                        // Add deploy-to-dev scripts here
+                    } else if (env.BRANCH_NAME.startsWith('release/')) {
+                        echo 'Deploying to STAGING environment...'
+                        // Add deploy-to-staging scripts here
+                    } else if (env.BRANCH_NAME == 'main') {
+                        echo 'Deploying to PRODUCTION environment...'
+                        // Add deploy-to-prod scripts here
+                    }
+                }
             }
         }
+
     }
 }
