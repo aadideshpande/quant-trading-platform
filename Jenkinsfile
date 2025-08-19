@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = "${BRANCH_NAME}-${BUILD_NUMBER}"
         DOCKER_REPO = 'aadideshpande1'
     }
 
