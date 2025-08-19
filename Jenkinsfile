@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-        IMAGE_TAG = "${BRANCH_NAME}-${BUILD_NUMBER}"
+        GIT_COMMIT_HASH = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        IMAGE_TAG = "${BRANCH_NAME}-${BUILD_NUMBER}-${GIT_COMMIT_HASH}"
         DOCKER_REPO = 'aadideshpande1'
     }
 
@@ -69,6 +70,8 @@ pipeline {
                         docker push ${DOCKER_REPO}/quant-trading-platform-price-service:${IMAGE_TAG}
                         docker push ${DOCKER_REPO}/quant-trading-platform-portfolio-service:${IMAGE_TAG}
                         docker push ${DOCKER_REPO}/quant-trading-platform-dashboard-ui:${IMAGE_TAG}
+
+                        echo "Docker Image Tag: ${IMAGE_TAG}"
                     """
                 }
             }
@@ -85,14 +88,15 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'develop') {
-                        echo 'Deploying to DEV environment...'
-                        // Add deploy-to-dev scripts here
+                        echo '✅ Auto-deploying to DEV environment...'
+                        // Insert deploy-to-dev.sh or docker-compose -f docker-compose.dev.yml up -d
                     } else if (env.BRANCH_NAME.startsWith('release/')) {
-                        echo 'Deploying to STAGING environment...'
-                        // Add deploy-to-staging scripts here
+                        echo '✅ Auto-deploying to STAGING environment...'
+                        // Insert deploy-to-staging.sh or docker-compose -f docker-compose.staging.yml up -d
                     } else if (env.BRANCH_NAME == 'main') {
-                        echo 'Deploying to PRODUCTION environment...'
-                        // Add deploy-to-prod scripts here
+                        input message: '⚠️ Manual approval required to deploy to PROD. Proceed?', ok: 'Deploy'
+                        echo '🚀 Deploying to PRODUCTION environment...'
+                        // Insert deploy-to-prod.sh or docker-compose -f docker-compose.prod.yml up -d
                     }
                 }
             }
