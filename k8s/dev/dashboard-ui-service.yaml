@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard-ui
+  namespace: dev
+spec:
+  selector:
+    app: dashboard-ui
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30004
+  type: NodePort

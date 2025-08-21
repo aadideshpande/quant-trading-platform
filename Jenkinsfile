@@ -87,20 +87,40 @@ pipeline {
             }
             steps {
                 script {
+                    def deployTo = ''
+                    def k8sPath = ''
+
                     if (env.BRANCH_NAME == 'develop') {
-                        echo 'Deploying to DEV...'
-                        // deploy to dev logic
+                        deployTo = 'DEV'
+                        k8sPath = 'k8s/dev'
                     } else if (env.BRANCH_NAME.startsWith('release/')) {
-                        echo 'Deploying to STAGING...'
-                        // deploy to staging logic
+                        deployTo = 'STAGING'
+                        k8sPath = 'k8s/staging'
                     } else if (env.BRANCH_NAME == 'main') {
                         input message: 'Manual approval required for production deployment'
-                        echo 'Deploying to PROD...'
-                        // deploy to prod logic
+                        deployTo = 'PROD'
+                        k8sPath = 'k8s/prod'
+                    }
+
+                    echo "🚀 Deploying to ${deployTo} from ${k8sPath}..."
+
+                    def services = [
+                        'order-service',
+                        'price-service',
+                        'portfolio-service',
+                        'dashboard-ui'
+                    ]
+
+                    services.each { svc ->
+                        sh """
+                            sed "s|\\\${IMAGE_TAG}|${IMAGE_TAG}|g" ${k8sPath}/${svc}-deployment.yaml | kubectl apply -f -
+                            kubectl apply -f ${k8sPath}/${svc}-service.yaml
+                        """
                     }
                 }
             }
         }
+
 
 
     }

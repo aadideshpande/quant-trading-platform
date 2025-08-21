@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: dev   # will change later when we add staging/prod
+  labels:
+    app: order-service
+spec:
+  replicas: 2   # number of pod replicas
+  selector:
+    matchLabels:
+      app: order-service
+  strategy:      # rolling update strategy
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: aadideshpande1/quant-trading-platform-order-service:develop-19-8320150
+          ports:
+            - containerPort: 5000
+          env:
+            - name: ENVIRONMENT
+              value: "dev"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret

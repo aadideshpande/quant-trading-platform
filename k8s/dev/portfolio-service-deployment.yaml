@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-service
+  namespace: dev
+  labels:
+    app: portfolio-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portfolio-service
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: portfolio-service
+    spec:
+      containers:
+        - name: portfolio-service
+          image: aadideshpande1/quant-trading-platform-portfolio-service:develop-19-8320150
+          ports:
+            - containerPort: 5002
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
