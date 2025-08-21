@@ -50,6 +50,12 @@ class TradeOut(BaseModel):
     class Config:
         orm_mode = True
 
+
+@app.get("/")
+def root():
+    return {"message": "✅ Phase 6: Jenkins pipeline deployed this!"}
+
+
 @app.get("/trades", response_model=List[TradeOut])
 async def get_trades():
     async with SessionLocal() as session:
